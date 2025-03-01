@@ -136,7 +136,7 @@ export default EventBus
 ```vue
 // 发送方组件
 <script setup>
-	import EventBus from 'eventBus.js'
+    import EventBus from 'eventBus.js'
     import { ref } from 'vue'
     const msg = ref('hello world')
     const sendMessage = () => {
