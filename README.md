@@ -6,13 +6,133 @@
 
 ### 简单的父子数据传递 props & $emit
 
+原理：利用 **自定义属性** 和 **自定义事件** 来传递
+
+> props官网说明：https://cn.vuejs.org/guide/components/props.html
+>
+> 事件官方说明：https://cn.vuejs.org/guide/components/events.html
+
+##### Vue 2
+
+父传子，通过在子组件声明自定义属性，在父组件传入数据进入子组件
+
+1. props传入数组
+
+```vue
+props:['msg','code']
+```
+
+2. props传入对象，添加简单的类型校验
+
+```vue
+props:{						// 简单的类型校验
+	msg:string
+    code:number
+}
+```
+
+3. props传入对象，添加复杂的设置：传入类型、默认值、是否必传、校验函数
+
+```vue
+props:{
+	msg:{
+		type:type,						// 传入类型
+       	default:val,					// 默认值
+       	required:boolean,				// 是否必须
+       	validator(value,props){			// 校验函数
+       		...
+       		return (true or false)
+       	}
+}
+```
+
+
+复杂类型（如对象、数组、函数）default，validator会有区别，这里暂不讲解，推荐去看官方文档
+
+```vue
+<template>
+	// 传入数据 在子组件中使用
+	<MyComponent :msg="'hello'" :code="100"></MyComponent>
+</template>
+```
+
+
+
+子传父，通过在子组件触发自定义事件，携带参数来到父组件层面
+
+```vue
+// 子组件
+<template>
+	<button @click="sendMessage">触发事件</button>
+</template>
+<script>
+	export default {
+        data(){
+            return { msg:'ciallo~' }
+        }
+        methods:{
+            sendMessage(){
+                // 触发父组件层面上的事件
+                this.$emit('getMessage',this.msg)
+            }
+        }
+    }
+</script>
+```
+
+```vue
+// 父组件
+<template>
+	<MyComponent @getMessage="setTitle"></MyComponent>
+	<p>{{ title }}</p>
+</template>
+<script>
+	export default {
+        data(){
+            return { title:'' }
+        }
+        methods:{
+            setTitle(msg){
+                this.title = msg
+            }
+		}
+    }
+</script>
+```
+
+props 的数据是外部的  →  不能直接改，要遵循单向数据流
+
+>  单向数据流：父级 props 的数据更新，会向下流动，影响子组件。这个数据流动是单向的
+
+
+
+##### Vue 3
+
+Vue 3 的实现与 Vue 2 的思路差不多 自定义属性
+
+
+
 
 
 ### 跨层级组件共享数据 provide & inject（依赖注入）
 
+作用：解决跨层级组件共享数据问题
+
+使用props：
+
+![](https://cn.vuejs.org/assets/prop-drilling.XJXa8UE-.png)
+
+使用 provide & inject 实现跨层级数据共享：
+
+![](https://cn.vuejs.org/assets/provide-inject.C0gAIfVn.png)
 
 
-### 数据通信的桥梁 -- 事件总线 eventBus
+
+
+
+
+
+### eventBus
 
 作用：非父子组件之间，进行简易消息传递。（复杂场景 → Vuex）
 
@@ -136,7 +256,7 @@ export default EventBus
 ```vue
 // 发送方组件
 <script setup>
-    import EventBus from 'eventBus.js'
+	import EventBus from 'eventBus.js'
     import { ref } from 'vue'
     const msg = ref('hello world')
     const sendMessage = () => {
