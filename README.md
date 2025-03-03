@@ -108,7 +108,38 @@ props 的数据是外部的  →  不能直接改，要遵循单向数据流
 
 ##### Vue 3
 
-Vue 3 的实现与 Vue 2 的思路差不多 自定义属性
+Vue 3 的 实现逻辑和 Vue 2 基本上像
+
+我们使用  `defineProps()` 编译器宏函数 定义 props，向子组件传递数据
+
+使用  `defineEmit()` 编译器宏函数定义 emit ，向父组件传递数据
+
+使用 `defineExpose()` 向父组件暴露自身的属性和方法
+
+> 在父组件不能直接使用，因为`<script setup>` 发生在实例化之前，无法访问到属性
+
+
+
+> 编译器宏函数：编译器宏函数是在编译时处理的宏定义，它可以将宏函数的调用替换为对应的代码块，而不是像普通宏一样简单地进行文本替换。
+
+```vue
+// defineProps defineEmits defineExpose 的使用
+<script setup>
+	import { ref, defineProps, defineEmits, defineExpose } from 'vue'	//导入对应的函数
+    const message = ref('Hello, The message comes from The Son Component')
+    const props = defineProps({			// 自定义属性
+        'msg':String,
+        'code':Number
+    })
+    const Emits = defineEmits(['getMessage'])	// 声明自定义事件名
+    const send = () => {
+        emits('getMessage',message)		// 触发自定义事件
+    }
+    defineExpose({			// 将数值名作为该组件实例的属性向外暴露
+        message
+    })
+</script>
+```
 
 
 
@@ -132,7 +163,7 @@ Vue 3 的实现与 Vue 2 的思路差不多 自定义属性
 
 
 
-### eventBus
+### 事件总线 eventBus
 
 作用：非父子组件之间，进行简易消息传递。（复杂场景 → Vuex）
 
